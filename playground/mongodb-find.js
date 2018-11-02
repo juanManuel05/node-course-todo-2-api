@@ -19,5 +19,5 @@ MongoClient.connect('mongodb://localhost:27017/TodoApp', (err,client)=>{
                 console.log('unable to fetch todos');
             }
         );
-    client.close();
+    //client.close();
 });
