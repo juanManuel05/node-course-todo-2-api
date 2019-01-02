@@ -1,6 +1,7 @@
-var express = require('express');
-var bodyParser = require('body-parser');
-var {ObjectID} = require('mongodb');
+const _ = require('lodash');
+const express = require('express');
+const bodyParser = require('body-parser');
+const {ObjectID} = require('mongodb');
 
 var {mongoose} = require('./db/mongoose');
 var {User} = require('./models/user');
@@ -64,6 +65,36 @@ app.delete('/delete/:id',(req,res)=>{
         }
         res.send({todo});
     }).catch((e)=>res.status(400).send(e));
+});
+
+app.patch('/patch/:id',(req,res)=>{
+    var id = req.params.id;
+
+    //Limit the user scope so he's just able tu update 'text' and 'completed' fields. When updating the field "$set:body"
+    //I just update the fields contained in "body" by that time.
+    var body = _.pick(req.body,['text','completed']);
+    console.log(body);
+
+    //valid ID
+    if(!ObjectID.isValid(id)){
+        return res.status(404).send('id not valid');
+    }
+
+    if(_.isBoolean(body.completed) && body.completed){
+        console.log('completed true');
+        body.completedAt = new Date().getTime();
+    }else{
+        console.log('completed false');
+        body.completed = false;
+        body.completedAt= null;
+    }
+    
+    Todo.findByIdAndUpdate(id,{$set:body},{new:true}).then((todo)=>{
+        if(!todo){
+            return res.status(404).send('not todo');
+        }
+        res.send({todo})
+    }).catch((e)=>res.status(404).send(e));
 });
 
 app.listen(port,()=>{
