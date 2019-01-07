@@ -7,11 +7,11 @@ const {Todo} = require('../models/todo');
 
 const todos = [
     {
-        text:"fist test to do",
+        text:"fist test to do TEST_ENV",
         _id: new ObjectID()
     },
     {
-        text:"second test to do",
+        text:"second test to do TEST_ENV",
         _id: new ObjectID(),
         completed:true,
         completedAt:333
