@@ -1,5 +1,6 @@
 require('./config/config');
 
+
 const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -8,6 +9,7 @@ const {ObjectID} = require('mongodb');
 var {mongoose} = require('./db/mongoose');
 var {User} = require('./models/user');
 var {Todo} = require('./models/todo');
+var {authenticate} = require('./Middleware/authenticate');
 
 var port = process.env.PORT;
  
@@ -28,18 +30,27 @@ app.post('/todos',(req,res)=>{
     );
 });
 
-app.post('/newUser',(req,res)=>{
+app.post('/users/newUser',(req,res)=>{
 
     //pick to make up body
     var userData = _.pick(req.body,['email','password']);
     var user = new User(userData);
-    user.save().then((user)=>{
-            res.send(user);
-        },(e)=>{
+
+    user.save().then(()=>{
+        return user.generateAuthToken();
+        })
+        .then((token)=>{
+            res.header('x-auth',token).send(user);
+        })
+        .catch((e)=>{
             res.status(400).send(e);
-        }
-    );
+        });    
 });
+
+app.get('/users/me',authenticate,(req,res)=>{
+    res.send(req.user);
+});
+
 
 app.get('/todos',(req,res)=>{
     Todo.find().then((todos)=>{
