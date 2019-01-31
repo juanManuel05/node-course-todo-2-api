@@ -59,6 +59,8 @@ UserSchema.statics.findByToken = function (token){
          'tokens.access': 'auth'
      });
 };
+
+//This method will be alwyas invoked before saving into the  DB. Its purpuose is to hash the userPassword
 UserSchema.pre('save',function(next){
     var user = this
 
@@ -66,9 +68,7 @@ UserSchema.pre('save',function(next){
     if(user.isModified('password')){
         bcrypt.genSalt(10,(err,salt)=>{
             bcrypt.hash(user.password,salt,(err,hash)=>{
-                console.log(hash);
                 user.password = hash;
-                console.log('hashedPpassword', user.password);
                 next();
             });
         });        

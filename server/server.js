@@ -73,7 +73,7 @@ app.get('/todos/:id',(req,res)=>{
             return res.status(404).send();
          }
          res.send({todo});
-     }).catch((e)=>res.status(400).send());
+     }).catch((e)=>res.status(400).send(e));
 
 });
 
@@ -99,7 +99,6 @@ app.patch('/patch/:id',(req,res)=>{
     //Limit the user scope so he's just able tu update 'text' and 'completed' fields. When updating the field "$set:body"
     //I just update the fields contained in "body" by that time.
     var body = _.pick(req.body,['text','completed']);
-    console.log(body);
 
     //valid ID
     if(!ObjectID.isValid(id)){
@@ -107,10 +106,8 @@ app.patch('/patch/:id',(req,res)=>{
     }
 
     if(_.isBoolean(body.completed) && body.completed){
-        console.log('completed true');
         body.completedAt = new Date().getTime();
     }else{
-        console.log('completed false');
         body.completed = false;
         body.completedAt= null;
     }
