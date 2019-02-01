@@ -39,8 +39,31 @@ UserSchema.methods.toJSON = function(){
     return _.pick(userObject,['_id','email']);
 };
 
-//Since i am gonna work over entire collections i better use a static method
+UserSchema.statics.findByCredentials = function(email,password) {
+    var User=this;
 
+    return User.findOne({email}).then((user)=>{
+        //No User
+        if(!user){
+            return Promise.reject();
+        }
+        
+        //Succesfull. Since all of the script.js library method support callbacks instead of Promises
+        //(in this case Cript.js) I will manually return a Promise
+
+        return new Promise((resolve,reject)=>{
+            bcrypt.compare(password,user.password,(err,res)=>{
+                if(res){
+                    resolve(user);
+                }else {
+                reject();
+                }
+            });
+        });
+    });
+};
+
+//Since i am gonna work over entire collections i better use a static method
 UserSchema.statics.findByToken = function (token){
     var User = this;
     var decoded;
