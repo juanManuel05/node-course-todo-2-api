@@ -1,20 +1,21 @@
 var {User} = require ('../models/user');
 
-var authenticate = (req,res,next) =>{
+var authenticate = async (req,res,next) =>{
     
     var token = req.header('x-auth');
-
-    User.findByToken(token).then((user)=>{
-        //No user found
+    try{
+    var user = await User.findByToken(token);
+    //No user found
       if(!user){
           return Promise.reject();
       }
-      req.user = user;
-      req.token = token;
-      next();
-    }).catch((e)=>{
+    }
+    catch(e){
         res.status(401).send();
-    })
+    }
+    req.user = user;
+    req.token = token;
+    next();    
 };
 
 module.exports = {authenticate};

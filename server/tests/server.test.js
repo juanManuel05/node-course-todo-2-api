@@ -148,7 +148,7 @@ describe('/DELETE todos/:id',()=>{
             }
        
             Todo.findById(hexId).then((todo)=>{
-                expect(todo).toExist;// It should still exist in the DB as i'm not suppose to remove anything
+                expect(todo).toExist;// It should still exist in the DB as i'm not supposed to remove anything
                 done();
             }).catch((e)=> done(e));
         });
