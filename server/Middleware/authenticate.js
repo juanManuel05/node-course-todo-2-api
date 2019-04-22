@@ -7,7 +7,8 @@ var authenticate = async (req,res,next) =>{
     var user = await User.findByToken(token);
     //No user found
       if(!user){
-          return Promise.reject();
+          console.log('NOT FOUND 404');
+        return Promise.reject();
       }
     }
     catch(e){

@@ -11,12 +11,14 @@ const {todos,populateTodos,users,populateUsers} = require('./seed/seed');
 beforeEach(populateUsers);
 beforeEach(populateTodos);
 
-describe('POST /todos', ()=>{
+//TODO TESTS
+
+describe('POST /todos/todo', ()=>{
     it('should create a new todo', (done)=>{
         const text = "test todo text";
 
         request(app)
-        .post('/todos')
+        .post('/todos/todo')
         .set('x-auth',users[0].tokens[0].token)
         .send({text}) // data to be stored in DB in field "text"        
         .expect(200)    
@@ -38,7 +40,7 @@ describe('POST /todos', ()=>{
 
     it('should not create a new todo', (done)=>{
         request(app)
-        .post('/todos')
+        .post('/todos/todo')
         .set('x-auth',users[0].tokens[0].token)
         .send({})
         .expect(400)
@@ -59,7 +61,7 @@ describe('POST /todos', ()=>{
 describe('/GET todos', ()=>{
     it('should get all todos',(done)=>{
             request(app)
-            .get('/todos')
+            .get('/todos/todos')
             .set('x-auth',users[0].tokens[0].token)
             .expect(200)
             .expect((res)=>{
@@ -225,6 +227,9 @@ describe('PATCH /todos/:id',()=>{
     });
 });
 
+
+//USER TESTS
+
 describe('GET /users/me',()=>{
     it('should return user if authenticated',(done)=>{
         request(app)
@@ -250,13 +255,13 @@ describe('GET /users/me',()=>{
     });   
 });
 
-describe('GET /users/newUser',()=>{
+describe('POST /users/user',()=>{
     it('should create a user',(done)=>{
         var email= 'email@test.com.au';
         var password = 'testpassword';
 
         request(app)
-        .post('/users/newUser')
+        .post('/users/user')
         .send({email,password})
         .expect(200)
         .expect((res)=>{
@@ -282,7 +287,7 @@ describe('GET /users/newUser',()=>{
     it('should return validation error if request invalid',(done)=>{
 
         request(app)
-        .post('/users/newUser')
+        .post('/users/user')
         .send({
             email:'emailInvalidtest.com.au',
             password:'123'
@@ -294,7 +299,7 @@ describe('GET /users/newUser',()=>{
     it('should not create user if email is in use',(done)=>{
         
         request(app)
-        .post('/users/newUser')
+        .post('/users/user')
         .send({
             email:users[0].email,
             password:'pass123'
