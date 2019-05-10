@@ -1,8 +1,6 @@
 //Node libraries
 const _ = require('lodash');
-
-//Middleware
-var {authenticate} = require('../Middleware/authenticate');
+const {ObjectID} = require('mongodb');
 
 //Models
 var {User} = require('../models/user');
@@ -37,12 +35,11 @@ exports.new_user =  async (req,res)=>{
     }
 };
 
-exports.me = authenticate, (req,res)=>{
-    console.log('============');
+exports.me = function (req,res){
     res.send(req.user);
 }
 
-exports.delete_token = authenticate, async (req,res)=>{
+exports.delete_token = async (req,res)=>{
     try{
         var user = await req.user.removeToken(req.token);
         res.status(200).send(user);
@@ -50,4 +47,13 @@ exports.delete_token = authenticate, async (req,res)=>{
     catch(e){
         res.status(400).send();  
     }
+};
+
+exports.delete_user = async (req,res)=>{
+    try {
+        await req.user.remove();
+        res.send(req.user);
+    } catch (e) {
+        res.status(500).send();
+    }    
 };

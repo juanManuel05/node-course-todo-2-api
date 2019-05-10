@@ -1,13 +1,11 @@
 //Node libraries
 const _ = require('lodash');
-
-//Middleware
-var {authenticate} = require('../Middleware/authenticate');
+const {ObjectID} = require('mongodb');
 
 //Models
 var {Todo} = require('../models/todo');
 
-exports.new_todo = authenticate, async(req,res)=>{
+exports.new_todo = async (req,res)=>{
     var todo = new Todo ({
         text: req.body.text,
         _creator: req.user._id
@@ -21,7 +19,7 @@ exports.new_todo = authenticate, async(req,res)=>{
     }
 };
 
-exports.get_todos= authenticate, async (req,res)=>{
+exports.get_todos= async (req,res)=>{
     try{
         var todos =await  Todo.find({_creator:req.user._id});
         res.send({todos}); //ECMS 6 ==>"{todos:todos}". could've sent back just the collection, instead sendings back an object I could add some new features(more flexibility)
@@ -31,7 +29,7 @@ exports.get_todos= authenticate, async (req,res)=>{
     }
 };
 
-exports.get_todo_id = authenticate, async(req,res)=>{
+exports.get_todo_id = async(req,res)=>{
     var id = req.params.id;
     //valid id provided
     if(!ObjectID.isValid(id)){
@@ -41,7 +39,7 @@ exports.get_todo_id = authenticate, async(req,res)=>{
     try{
        var todo= await Todo.findOne({_id:id,_creator:req.user._id});
        if(!todo){
-           return res.status(404).send();
+           return res.status(404).send('Todo not found');
        }
        res.send({todo});
    }
@@ -50,7 +48,7 @@ exports.get_todo_id = authenticate, async(req,res)=>{
    }
 };
 
-exports.delete_todo = authenticate,async(req,res)=>{
+exports.delete_todo = async(req,res)=>{
 
     var id = req.params.id;
 
@@ -63,13 +61,14 @@ exports.delete_todo = authenticate,async(req,res)=>{
         if(!todo){
             res.status(404).send(todo);
         }
-        res.send({todo});    }
+        res.send({todo});    
+    }
     catch(e){
         res.status(400).send(e);
     }
 };
 
-exports.patch_todo = authenticate, async(req,res)=>{
+exports.patch_todo = async(req,res)=>{
     var id = req.params.id;
 
     //Limit the user scope so he's just able tu update 'text' and 'completed' fields. When updating the field "$set:body"

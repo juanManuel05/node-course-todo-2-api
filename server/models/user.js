@@ -3,6 +3,7 @@ const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
+var {Todo} = require('./todo');
 
 var UserSchema = new mongoose.Schema({    
     email:{
@@ -32,6 +33,13 @@ var UserSchema = new mongoose.Schema({
         }
     }]
 });
+
+UserSchema.virtual('todos',{
+    ref:'Todo',
+    localField:'_id',
+    foreignField:'_creator'
+})
+
 UserSchema.methods.toJSON = function(){
     var user = this;
     var userObject = user.toObject();
@@ -100,6 +108,12 @@ UserSchema.pre('save',function(next){
     }
 });
 
+//Middleware invkoed when a user is deleted so their associated TodoS get deleted as well
+UserSchema.pre('remove', async function(next){
+    const user = this;
+    await Todo.deleteMany({_creator:user._id});
+    next();
+});
 
 UserSchema.methods.generateAuthToken = function(){
     var user = this;
